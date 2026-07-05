@@ -201,9 +201,9 @@ class TestOpenCLBackend:
         result = opencl.scan(np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32), inclusive=False)
         assert result[0] == pytest.approx(0.0, abs=1e-6)
 
-    def test_sort_not_yet_implemented(self, opencl):
-        with pytest.raises(NotImplementedError):
-            opencl.sort(np.ones(4, dtype=np.float32))
+    def test_sort_executes(self, opencl):
+        result = opencl.sort(np.array([3.0, 1.0, 2.0, 4.0], dtype=np.float32))
+        assert result[0] == pytest.approx(1.0)
 
     def test_gemm_not_yet_implemented(self, opencl):
         with pytest.raises(NotImplementedError):

@@ -17,3 +17,7 @@ target_include_directories(reduce_test PRIVATE include)
 add_executable(scan_test host/scan.cpp)
 target_link_libraries(scan_test PRIVATE OpenCL::OpenCL)
 target_include_directories(scan_test PRIVATE include)
+
+add_executable(sort_test host/sort.cpp)
+target_link_libraries(sort_test PRIVATE OpenCL::OpenCL)
+target_include_directories(sort_test PRIVATE include)

@@ -143,7 +143,27 @@ class OpenCLBackend(Backend):
         return result
 
     def sort(self, data: np.ndarray) -> np.ndarray:
-        raise NotImplementedError("Sort kernel implemented in Phase 5")
+        data = data.astype(np.float32)
+        n = len(data)
+
+        log2_n = max(1, math.ceil(math.log2(max(n, 2))))
+        n_padded = 1 << log2_n
+
+        padded = np.full(n_padded, np.finfo(np.float32).max, dtype=np.float32)
+        padded[:n] = data
+
+        mf = self._cl.mem_flags
+        d_data = self._cl.Buffer(self.ctx, mf.READ_WRITE | mf.COPY_HOST_PTR, hostbuf=padded)
+
+        kernel = self._load_kernel("sort.cl", "bitonic_sort_step")
+        for stage in range(log2_n):
+            for step in range(stage, -1, -1):
+                kernel(self.queue, (n_padded,), None,
+                       d_data, np.int32(stage), np.int32(step))
+
+        self._cl.enqueue_copy(self.queue, padded, d_data)
+        self.queue.finish()
+        return padded[:n].copy()
 
     def gemm(self, A: np.ndarray, B: np.ndarray) -> np.ndarray:
         raise NotImplementedError("GEMM kernel implemented in Phase 6")
