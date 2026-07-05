@@ -166,4 +166,30 @@ class OpenCLBackend(Backend):
         return padded[:n].copy()
 
     def gemm(self, A: np.ndarray, B: np.ndarray) -> np.ndarray:
-        raise NotImplementedError("GEMM kernel implemented in Phase 6")
+        A = A.astype(np.float32)
+        B = B.astype(np.float32)
+        M, K = A.shape
+        K2, N = B.shape
+        if K != K2:
+            raise ValueError(f"Shape mismatch: A is {M}x{K}, B is {K2}x{N}")
+
+        TILE = 16
+        global_m = math.ceil(M / TILE) * TILE
+        global_n = math.ceil(N / TILE) * TILE
+
+        mf = self._cl.mem_flags
+        d_A = self._cl.Buffer(self.ctx, mf.READ_ONLY  | mf.COPY_HOST_PTR, hostbuf=A)
+        d_B = self._cl.Buffer(self.ctx, mf.READ_ONLY  | mf.COPY_HOST_PTR, hostbuf=B)
+        d_C = self._cl.Buffer(self.ctx, mf.WRITE_ONLY, M * N * 4)
+
+        kernel = self._load_kernel("gemm.cl", "gemm")
+        kernel(self.queue, (global_m, global_n), (TILE, TILE),
+               d_A, d_B, d_C,
+               np.int32(M), np.int32(K), np.int32(N),
+               self._cl.LocalMemory(TILE * TILE * 4),
+               self._cl.LocalMemory(TILE * TILE * 4))
+
+        C = np.empty((M, N), dtype=np.float32)
+        self._cl.enqueue_copy(self.queue, C, d_C)
+        self.queue.finish()
+        return C

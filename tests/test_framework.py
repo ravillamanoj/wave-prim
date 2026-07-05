@@ -205,6 +205,7 @@ class TestOpenCLBackend:
         result = opencl.sort(np.array([3.0, 1.0, 2.0, 4.0], dtype=np.float32))
         assert result[0] == pytest.approx(1.0)
 
-    def test_gemm_not_yet_implemented(self, opencl):
-        with pytest.raises(NotImplementedError):
-            opencl.gemm(np.ones((2, 2), dtype=np.float32), np.ones((2, 2), dtype=np.float32))
+    def test_gemm_executes(self, opencl):
+        I = np.eye(4, dtype=np.float32)
+        result = opencl.gemm(I, I)
+        assert result.shape == (4, 4)

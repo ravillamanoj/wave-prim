@@ -21,3 +21,7 @@ target_include_directories(scan_test PRIVATE include)
 add_executable(sort_test host/sort.cpp)
 target_link_libraries(sort_test PRIVATE OpenCL::OpenCL)
 target_include_directories(sort_test PRIVATE include)
+
+add_executable(gemm_test host/gemm.cpp)
+target_link_libraries(gemm_test PRIVATE OpenCL::OpenCL)
+target_include_directories(gemm_test PRIVATE include)
