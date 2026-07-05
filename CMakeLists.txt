@@ -13,3 +13,7 @@ target_include_directories(device_query PRIVATE include)
 add_executable(reduce_test host/reduce.cpp)
 target_link_libraries(reduce_test PRIVATE OpenCL::OpenCL)
 target_include_directories(reduce_test PRIVATE include)
+
+add_executable(scan_test host/scan.cpp)
+target_link_libraries(scan_test PRIVATE OpenCL::OpenCL)
+target_include_directories(scan_test PRIVATE include)

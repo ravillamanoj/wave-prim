@@ -105,7 +105,42 @@ class OpenCLBackend(Backend):
         return float({"sum": np.sum, "min": np.min, "max": np.max}[op](partial))
 
     def scan(self, data: np.ndarray, inclusive: bool = True) -> np.ndarray:
-        raise NotImplementedError("Scan kernel implemented in Phase 4")
+        data = data.astype(np.float32)
+        n = len(data)
+        wg = self._WG_SIZE
+        block_size = wg * 2
+        num_blocks = math.ceil(n / block_size)
+        global_size = num_blocks * wg
+
+        mf = self._cl.mem_flags
+        d_input      = self._cl.Buffer(self.ctx, mf.READ_ONLY  | mf.COPY_HOST_PTR, hostbuf=data)
+        d_output     = self._cl.Buffer(self.ctx, mf.READ_WRITE, data.nbytes)
+        d_block_sums = self._cl.Buffer(self.ctx, mf.READ_WRITE, num_blocks * data.itemsize)
+        local_mem    = self._cl.LocalMemory(block_size * data.itemsize)
+
+        k_scan = self._load_kernel("scan.cl", "scan_exclusive")
+        k_scan(self.queue, (global_size,), (wg,),
+               d_output, d_input, d_block_sums, local_mem, np.int32(n))
+
+        if num_blocks > 1:
+            block_sums = np.empty(num_blocks, dtype=np.float32)
+            self._cl.enqueue_copy(self.queue, block_sums, d_block_sums)
+            self.queue.finish()
+            offsets = np.concatenate([[0.0], np.cumsum(block_sums, dtype=np.float64)[:-1]]).astype(np.float32)
+            d_offsets = self._cl.Buffer(self.ctx, mf.READ_ONLY | mf.COPY_HOST_PTR, hostbuf=offsets)
+
+            add_global = math.ceil(n / wg) * wg
+            k_add = self._load_kernel("scan.cl", "scan_add_offsets")
+            k_add(self.queue, (add_global,), (wg,),
+                  d_output, d_offsets, np.int32(n), np.int32(block_size))
+
+        result = np.empty(n, dtype=np.float32)
+        self._cl.enqueue_copy(self.queue, result, d_output)
+        self.queue.finish()
+
+        if inclusive:
+            result += data
+        return result
 
     def sort(self, data: np.ndarray) -> np.ndarray:
         raise NotImplementedError("Sort kernel implemented in Phase 5")
