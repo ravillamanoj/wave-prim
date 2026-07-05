@@ -1,6 +1,12 @@
 # wave-prim
 
 [![CI](https://github.com/ravillamanoj/wave-prim/actions/workflows/ci.yml/badge.svg)](https://github.com/ravillamanoj/wave-prim/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![OpenCL](https://img.shields.io/badge/OpenCL-1.2%2B-red.svg)](https://www.khronos.org/opencl/)
+[![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://en.cppreference.com/w/cpp/17)
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![ARM Mali](https://img.shields.io/badge/Target-ARM%20Mali%20Valhall-0091BD.svg)](https://developer.arm.com/Processors/Mali-G715)
+[![POCL](https://img.shields.io/badge/CI%20runtime-POCL-green.svg)](http://portablecl.org/)
 
 OpenCL parallel primitives for ARM Mali GPU — reduce, prefix scan, bitonic sort,
 and tiled GEMM — with a property-based correctness testing framework that runs
@@ -331,3 +337,33 @@ GitHub Actions runs on every push to `main`:
 4. Run the full Python test suite (207 tests)
 
 No physical GPU is required at any stage of the pipeline.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+```
+MIT License
+
+Copyright (c) 2026 ravillamanoj
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
