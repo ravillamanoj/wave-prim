@@ -193,9 +193,9 @@ class TestOpenCLBackend:
     def test_backend_instantiates(self, opencl):
         assert opencl is not None
 
-    def test_reduce_not_yet_implemented(self, opencl):
-        with pytest.raises(NotImplementedError):
-            opencl.reduce(np.ones(4, dtype=np.float32))
+    def test_reduce_executes(self, opencl):
+        result = opencl.reduce(np.ones(4, dtype=np.float32), "sum")
+        assert result == pytest.approx(4.0)
 
     def test_scan_not_yet_implemented(self, opencl):
         with pytest.raises(NotImplementedError):

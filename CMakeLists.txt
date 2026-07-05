@@ -9,3 +9,7 @@ find_package(OpenCL REQUIRED)
 add_executable(device_query host/device_query.cpp)
 target_link_libraries(device_query PRIVATE OpenCL::OpenCL)
 target_include_directories(device_query PRIVATE include)
+
+add_executable(reduce_test host/reduce.cpp)
+target_link_libraries(reduce_test PRIVATE OpenCL::OpenCL)
+target_include_directories(reduce_test PRIVATE include)
