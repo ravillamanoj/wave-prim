@@ -16,10 +16,15 @@
  *
  * Out-of-bounds loads are replaced with 0, so callers do not need to
  * pad matrices to multiples of TILE_SIZE.
+ *
+ * reqd_work_group_size lets the compiler schedule the 16-iteration inner
+ * loop as a static fused-multiply-add chain and optimise local memory
+ * access patterns for the Mali Valhall register file width.
  */
 
 #define TILE_SIZE 16
 
+__attribute__((reqd_work_group_size(TILE_SIZE, TILE_SIZE, 1)))
 __kernel void gemm(
     __global const float* A,
     __global const float* B,
@@ -45,6 +50,7 @@ __kernel void gemm(
 
         barrier(CLK_LOCAL_MEM_FENCE);
 
+#pragma unroll
         for (int k = 0; k < TILE_SIZE; ++k)
             acc += tileA[lr * TILE_SIZE + k] * tileB[k * TILE_SIZE + lc];
 

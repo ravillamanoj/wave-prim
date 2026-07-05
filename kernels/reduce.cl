@@ -5,12 +5,17 @@
  * local (shared) memory. The host performs the second-pass aggregation
  * over the partial results.
  *
+ * reqd_work_group_size(256,1,1) lets the compiler unroll the reduction
+ * loop (exactly log2(256) = 8 iterations) and allocate registers
+ * statically instead of computing wg_size at runtime.
+ *
  * Identity elements used for out-of-bounds padding:
  *   sum ->  0.0f
  *   min ->  MAXFLOAT
  *   max -> -MAXFLOAT
  */
 
+__attribute__((reqd_work_group_size(256, 1, 1)))
 __kernel void reduce_sum(
     __global const float* restrict input,
     __global       float* restrict partial,
@@ -32,6 +37,7 @@ __kernel void reduce_sum(
     if (lid == 0) partial[get_group_id(0)] = local_data[0];
 }
 
+__attribute__((reqd_work_group_size(256, 1, 1)))
 __kernel void reduce_min(
     __global const float* restrict input,
     __global       float* restrict partial,
@@ -53,6 +59,7 @@ __kernel void reduce_min(
     if (lid == 0) partial[get_group_id(0)] = local_data[0];
 }
 
+__attribute__((reqd_work_group_size(256, 1, 1)))
 __kernel void reduce_max(
     __global const float* restrict input,
     __global       float* restrict partial,

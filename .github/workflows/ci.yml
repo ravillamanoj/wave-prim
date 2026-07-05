@@ -35,5 +35,17 @@ jobs:
       - name: Query OpenCL devices
         run: ./build/device_query
 
-      - name: Run tests
+      - name: Validate reduce kernel
+        run: ./build/reduce_test kernels/reduce.cl
+
+      - name: Validate scan kernel
+        run: ./build/scan_test kernels/scan.cl
+
+      - name: Validate sort kernel
+        run: ./build/sort_test kernels/sort.cl
+
+      - name: Validate GEMM kernel
+        run: ./build/gemm_test kernels/gemm.cl
+
+      - name: Run Python test suite
         run: pytest tests/ -v

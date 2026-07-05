@@ -14,8 +14,13 @@
  *   3. Calls scan_add_offsets to add block offsets back to output[]
  *
  * Inclusive scan: caller adds input[i] to each output[i] after the fact.
+ *
+ * reqd_work_group_size(256,1,1) enables the compiler to unroll the
+ * up-sweep and down-sweep loops (both have exactly log2(512)=9 steps
+ * when block_size = 2*256 = 512) and optimise the barrier placements.
  */
 
+__attribute__((reqd_work_group_size(256, 1, 1)))
 __kernel void scan_exclusive(
     __global       float* output,
     __global const float* input,
@@ -78,6 +83,7 @@ __kernel void scan_exclusive(
  * Add per-block prefix offsets to make the scan global.
  * Each element looks up its block's offset using its global index.
  */
+__attribute__((reqd_work_group_size(256, 1, 1)))
 __kernel void scan_add_offsets(
     __global float*       output,
     __global const float* offsets,
